@@ -2,6 +2,9 @@ package org.example.ebanking.services;
 
 
 import org.example.ebanking.dtos.*;
+import org.example.ebanking.exceptions.BalanceNotSufficientException;
+import org.example.ebanking.exceptions.BankAccountNotFoundException;
+import org.example.ebanking.exceptions.CustomerNotFoundException;
 
 import java.util.List;
 public interface BankAccountService {
