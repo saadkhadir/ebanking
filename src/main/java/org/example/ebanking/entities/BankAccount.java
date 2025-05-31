@@ -6,6 +6,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.ebanking.enums.AccountStatus;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 
 import java.util.Date;
@@ -25,5 +27,6 @@ public abstract class BankAccount {
     private Customer customer;
 
     @OneToMany(mappedBy = "bankAccount",fetch = FetchType.LAZY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private List<AccountOperation> accountOperations;
 }

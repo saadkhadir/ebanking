@@ -21,23 +21,23 @@ public class BankAccountRestAPI {
     }
 
     @GetMapping("/accounts/{accountId}")
-    @PreAuthorize("hasAuthority(SCOPE_USER)")
+    @PreAuthorize("hasAuthority(SCOPE_CLIENT)")
     public BankAccountDTO getBankAccount(@PathVariable String accountId) throws BankAccountNotFoundException {
         return bankAccountService.getBankAccount(accountId);
     }
     @GetMapping("/accounts")
-    @PreAuthorize("hasAuthority(SCOPE_USER)")
+    @PreAuthorize("hasAuthority(SCOPE_CLIENT)")
     public List<BankAccountDTO> listAccounts(){
         return bankAccountService.bankAccountList();
     }
     @GetMapping("/accounts/{accountId}/operations")
-    @PreAuthorize("hasAuthority(SCOPE_USER)")
+    @PreAuthorize("hasAuthority(SCOPE_CLIENT)")
     public List<AccountOperationDTO> getHistory(@PathVariable String accountId){
         return bankAccountService.accountHistory(accountId);
     }
 
     @GetMapping("/accounts/{accountId}/pageOperations")
-    @PreAuthorize("hasAuthority(SCOPE_USER)")
+    @PreAuthorize("hasAuthority(SCOPE_CLIENT)")
     public AccountHistoryDTO getAccountHistory(
             @PathVariable String accountId,
             @RequestParam(name="page",defaultValue = "0") int page,
@@ -57,7 +57,7 @@ public class BankAccountRestAPI {
         return creditDTO;
     }
     @PostMapping("/accounts/transfer")
-    @PreAuthorize("hasAuthority(SCOPE_USER)")
+    @PreAuthorize("hasAuthority(SCOPE_CLIENT)")
     public void transfer(@RequestBody TransferRequestDTO transferRequestDTO) throws BankAccountNotFoundException, BalanceNotSufficientException {
         this.bankAccountService.transfer(
                 transferRequestDTO.getAccountSource(),

@@ -28,6 +28,7 @@ public class EbankingApplication {
     public static void main(String[] args) {
         SpringApplication.run(EbankingApplication.class, args);
     }
+
     @Bean
     CommandLineRunner commandLineRunner(BankAccountService bankAccountService){
         return args -> {
