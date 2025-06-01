@@ -18,8 +18,45 @@ To use these colors in markdown, apply them via HTML tags and inline styles.
 <div style="background: linear-gradient(135deg, #f8fafc 0%, #e0e7ef 100%); padding: 32px 0;">
   <h1 style="color: #2563eb; text-align: center; font-size: 2.5rem; font-weight: bold; margin-bottom: 0.5em; letter-spacing: -1px;">E-Banking Application Documentation</h1>
   <p style="color: #64748b; text-align: center; font-size: 1.2rem; max-width: 900px; margin: 0 auto 2em auto;">
-    This document provides a comprehensive overview of the main components in the E-Banking application, including entities, enums, repositories, DTOs, mappers, services, exceptions, REST controllers, and the security layer. The application is built with Java, Spring Boot, and follows a layered architecture to ensure maintainability and scalability.
+    This document provides a comprehensive overview of the E-Banking project, including its architecture, main components, and both backend and frontend documentation. The application is built with Java, Spring Boot, Angular, and Tailwind CSS, following a layered and modular architecture for maintainability and scalability.
   </p>
+</div>
+
+---
+
+# <span style="color: #1e40af;">Project Presentation</span>
+
+<div style="background: #e0e7ef; padding: 1em 2em; border-radius: 8px; margin-bottom: 1.5em;">
+<b>E-Banking</b> is a full-stack web application that simulates a modern online banking platform. It allows users to manage their bank accounts, perform transactions (debit, credit, transfer), view account history, and access analytics dashboards. The project is designed for educational and demonstration purposes, showcasing best practices in Java Spring Boot (backend) and Angular (frontend) development, with a focus on security (JWT), clean code, and responsive UI.
+</div>
+
+# <span style="color: #1e40af;">Project Architecture</span>
+
+<div style="background: #e0e7ef; padding: 1em 2em; border-radius: 8px; margin-bottom: 1.5em;">
+<b>Global Structure:</b>
+<ul style="color: #0f172a;">
+  <li><b>Backend (Java, Spring Boot)</b>:<br>
+    <ul>
+      <li>Layered architecture: <b>Entities</b> (JPA), <b>Repositories</b> (Spring Data), <b>Services</b> (business logic), <b>DTOs</b> (data transfer), <b>Mappers</b>, <b>Controllers</b> (REST API), <b>Security</b> (Spring Security, JWT).</li>
+      <li>Located in <code>src/main/java/org/example/ebanking/</code>.</li>
+      <li>Configuration in <code>application.properties</code>.</li>
+    </ul>
+  </li>
+  <li><b>Frontend (Angular, Tailwind CSS)</b>:<br>
+    <ul>
+      <li>Modular structure: <b>Components</b> (accounts, customers, dashboard, login, navbar), <b>Services</b> (API, auth), <b>Models</b>, <b>Routing</b>.</li>
+      <li>Located in <code>client-ebank/src/app/</code>.</li>
+      <li>Styling with <b>Tailwind CSS</b> for a modern, responsive UI.</li>
+    </ul>
+  </li>
+  <li><b>Communication</b>:<br>
+    <ul>
+      <li>RESTful API between frontend and backend.</li>
+      <li>JWT authentication for secure access to protected resources.</li>
+    </ul>
+  </li>
+</ul>
+<b>Deployment:</b> The application can be run locally for development or deployed to a cloud platform. The frontend and backend are decoupled and can be scaled independently.
 </div>
 
 ---
