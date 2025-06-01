@@ -198,4 +198,80 @@ The security layer secures the application's endpoints using Spring Security and
 
 ---
 
-<!-- Continue the same style for all other sections -->
+# <span style="color: #1e40af;">Frontend (Angular)</span>
+
+<div style="background: #e0e7ef; padding: 1em 2em; border-radius: 8px; margin-bottom: 1.5em;">
+This section documents the Angular frontend located in <code>client-ebank/</code>. It covers the main modules, components, services, models, and routing structure.
+</div>
+
+## <span style="color: #2563eb;">App Component</span>
+<div style="background: #f8fafc; padding: 1em 2em; border-radius: 8px; margin-bottom: 1.5em;">
+<ul style="color: #0f172a;">
+  <li><b>app.ts</b>: Root component logic. Handles route changes to show/hide the navbar.</li>
+  <li><b>app.html</b>: Root template. Displays the navbar (except on /login) and the router outlet.</li>
+  <li><b>app.css</b>: Global styles for layout and background.</li>
+</ul>
+</div>
+
+## <span style="color: #2563eb;">Routing</span>
+<div style="background: #f8fafc; padding: 1em 2em; border-radius: 8px; margin-bottom: 1.5em;">
+Routing is defined in <b>app.routes.ts</b> and maps URL paths to components:
+<ul style="color: #0f172a;">
+  <li><b>''</b>: Redirects to dashboard</li>
+  <li><b>'login'</b>: Login page</li>
+  <li><b>'dashboard'</b>: Dashboard page</li>
+  <li><b>'customers'</b>: Customers management</li>
+  <li><b>'accounts'</b>: Accounts management</li>
+  <li><b>'**'</b>: Wildcard, redirects to dashboard</li>
+</ul>
+</div>
+
+## <span style="color: #2563eb;">Modules & Components</span>
+<div style="background: #f8fafc; padding: 1em 2em; border-radius: 8px; margin-bottom: 1.5em;">
+<ul style="color: #0f172a;">
+  <li><b>Login</b> (login.ts, login.html, login.css): User authentication form, handles login, error display, and navigation.</li>
+  <li><b>Customers</b> (customers.ts, customers.html, customers.css): CRUD for customers, search, edit, create, delete, and view details in modal.</li>
+  <li><b>Accounts</b> (accounts.ts, accounts.html, accounts.css): List and manage accounts, view details, history, and perform debit/credit/transfer operations.</li>
+  <li><b>Dashboard</b> (dashboard.ts, dashboard.html, dashboard.css): Analytics dashboard with statistics, charts (ng2-charts/Chart.js), and recent operations.</li>
+  <li><b>Navbar</b> (navbar.ts, navbar.html, navbar.css): Responsive navigation bar, links to main pages, logout, adapts to authentication state.</li>
+</ul>
+</div>
+
+## <span style="color: #2563eb;">Services</span>
+<div style="background: #f8fafc; padding: 1em 2em; border-radius: 8px; margin-bottom: 1.5em;">
+<ul style="color: #0f172a;">
+  <li><b>auth.service.ts</b>: Handles login, logout, JWT token storage, and authentication state.</li>
+  <li><b>customer.service.ts</b>: CRUD operations for customers, search, and API communication (with JWT).</li>
+  <li><b>account.service.ts</b>: Account management, operations (debit, credit, transfer), and history (with JWT).</li>
+</ul>
+</div>
+
+## <span style="color: #2563eb;">Models</span>
+<div style="background: #f8fafc; padding: 1em 2em; border-radius: 8px; margin-bottom: 1.5em;">
+<ul style="color: #0f172a;">
+  <li><b>customer.model.ts</b>: Defines the <code>Customer</code> interface (id, name, email, password?).</li>
+</ul>
+</div>
+
+## <span style="color: #2563eb;">Technologies</span>
+<div style="background: #f8fafc; padding: 1em 2em; border-radius: 8px; margin-bottom: 1.5em;">
+<ul style="color: #0f172a;">
+  <li>Angular 17+</li>
+  <li>TypeScript</li>
+  <li>Tailwind CSS</li>
+  <li>ng2-charts & Chart.js (for dashboard)</li>
+  <li>JWT authentication (with backend)</li>
+</ul>
+</div>
+
+## <span style="color: #2563eb;">Notes</span>
+<div style="background: #f8fafc; padding: 1em 2em; border-radius: 8px; margin-bottom: 1.5em;">
+<ul style="color: #0f172a;">
+  <li>All API requests include the JWT token in the Authorization header.</li>
+  <li>Responsive design for desktop and mobile.</li>
+  <li>Exception and error handling for user-friendly feedback.</li>
+  <li>For development, run <code>npm install</code> then <code>npm start</code> in <code>client-ebank/</code>.</li>
+</ul>
+</div>
+
+---
