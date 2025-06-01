@@ -1,28 +1,297 @@
-<div>
-    <!-- Loading state -->
-    <div *ngIf="loading">Chargement...</div>
-
-    <!-- Error state -->
-    <div *ngIf="error">{{error}}</div>
-
-    <!-- Data display -->
-    <div *ngIf="!loading && !error">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Name</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let customer of customers">
-                    <td>{{customer.id}}</td>
-                    <td>{{customer.name}}</td>
-                    <td>{{customer.email}}</td>
-                </tr>
-            </tbody>
-        </table>
+<div class="bg-gray-50 min-h-screen p-6">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Gestion des Clients</h1>
+      <button
+        (click)="toggleCreateForm()"
+        class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+        </svg>
+        Nouveau Client
+      </button>
     </div>
+
+    <!-- Messages de notifications -->
+    <div *ngIf="updateSuccess" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md shadow-sm">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        Le client a été mis à jour avec succès
+      </div>
+    </div>
+
+    <div *ngIf="createSuccess" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md shadow-sm">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        Le client a été créé avec succès
+      </div>
+    </div>
+
+    <div *ngIf="deleteSuccess" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md shadow-sm">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+        </svg>
+        Le client a été supprimé avec succès
+      </div>
+    </div>
+
+    <div *ngIf="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md shadow-sm">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        {{ error }}
+      </div>
+      <button (click)="error = null" class="text-sm underline mt-1">Fermer</button>
+    </div>
+
+    <!-- Formulaire de création -->
+    <div *ngIf="showCreateForm" class="bg-white p-6 rounded-lg shadow-md mb-6 border border-gray-200">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">Ajouter un nouveau client</h2>
+      <form [formGroup]="createForm" (ngSubmit)="createCustomer()" class="space-y-4">
+        <div>
+          <label for="create-name" class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+          <input
+            id="create-name"
+            type="text"
+            formControlName="name"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="Nom du client"
+          >
+          <div *ngIf="createForm.get('name')?.invalid && createForm.get('name')?.touched"
+               class="text-red-600 text-sm mt-1">
+            Le nom est obligatoire
+          </div>
+        </div>
+
+        <div>
+          <label for="create-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input
+            id="create-email"
+            type="email"
+            formControlName="email"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            placeholder="email@exemple.com"
+          >
+          <div *ngIf="createForm.get('email')?.invalid && createForm.get('email')?.touched"
+               class="text-red-600 text-sm mt-1">
+            Un email valide est obligatoire
+          </div>
+        </div>
+
+        <div class="flex space-x-3 pt-2">
+          <button
+            type="submit"
+            [disabled]="createForm.invalid"
+            class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Créer
+          </button>
+          <button
+            type="button"
+            (click)="toggleCreateForm()"
+            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md"
+          >
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Recherche -->
+    <div class="bg-white p-4 rounded-lg shadow-sm mb-6 border border-gray-200">
+      <div class="flex items-center">
+        <div class="flex-grow flex">
+          <input
+            type="text"
+            [(ngModel)]="searchKeyword"
+            placeholder="Rechercher des clients..."
+            class="w-full px-3 py-2 border border-gray-300 rounded-l-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+          <button
+            (click)="searchCustomers()"
+            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-r-md border-blue-600"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </button>
+        </div>
+        <button
+          *ngIf="searchKeyword"
+          (click)="clearSearch()"
+          class="ml-3 px-3 py-2 text-gray-600 hover:text-gray-800"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Détails d'un client spécifique -->
+    <div *ngIf="viewingCustomer" class="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
+      <div class="bg-white rounded-lg p-6 max-w-md w-full">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-xl font-bold">Détails du client</h3>
+          <button (click)="closeDetails()" class="text-gray-500 hover:text-gray-700">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+        <div class="space-y-4">
+          <div class="flex border-b pb-2">
+            <span class="font-medium w-24">ID:</span>
+            <span>{{ viewingCustomer.id }}</span>
+          </div>
+          <div class="flex border-b pb-2">
+            <span class="font-medium w-24">Nom:</span>
+            <span>{{ viewingCustomer.name }}</span>
+          </div>
+          <div class="flex">
+            <span class="font-medium w-24">Email:</span>
+            <span>{{ viewingCustomer.email }}</span>
+          </div>
+        </div>
+        <div class="mt-6">
+          <button
+            (click)="closeDetails()"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md"
+          >
+            Fermer
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Formulaire d'édition -->
+    <div *ngIf="editingCustomer" class="bg-white p-6 rounded-lg shadow-md mb-6 border border-gray-200">
+      <h2 class="text-xl font-semibold mb-4 text-gray-700">Modifier le client</h2>
+      <form [formGroup]="editForm" (ngSubmit)="updateCustomer()" class="space-y-4">
+        <div>
+          <label for="edit-name" class="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+          <input
+            id="edit-name"
+            type="text"
+            formControlName="name"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+          <div *ngIf="editForm.get('name')?.invalid && editForm.get('name')?.touched"
+               class="text-red-600 text-sm mt-1">
+            Le nom est obligatoire
+          </div>
+        </div>
+
+        <div>
+          <label for="edit-email" class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <input
+            id="edit-email"
+            type="email"
+            formControlName="email"
+            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          >
+          <div *ngIf="editForm.get('email')?.invalid && editForm.get('email')?.touched"
+               class="text-red-600 text-sm mt-1">
+            Un email valide est obligatoire
+          </div>
+        </div>
+
+        <div class="flex space-x-3 pt-2">
+          <button
+            type="submit"
+            [disabled]="editForm.invalid"
+            class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium py-2 px-4 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            Enregistrer
+          </button>
+          <button
+            type="button"
+            (click)="cancelEdit()"
+            class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded-md"
+          >
+            Annuler
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Liste des clients -->
+    <div *ngIf="loading" class="flex justify-center my-12">
+      <div class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-md">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Chargement...
+      </div>
+    </div>
+
+    <div *ngIf="!loading && customers.length === 0" class="bg-white p-8 rounded-lg shadow-md text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+      </svg>
+      <h3 class="text-lg font-medium text-gray-700 mt-4">Aucun client trouvé</h3>
+      <p class="text-gray-500 mt-2">Il n'y a pas de clients correspondant à votre recherche.</p>
+    </div>
+
+    <div *ngIf="!loading && customers.length > 0" class="overflow-hidden bg-white shadow-md rounded-lg border border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr *ngFor="let customer of customers" class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ customer.id }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.name }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">{{ customer.email }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <div class="flex justify-end space-x-2">
+                <button
+                  (click)="viewCustomerDetails(customer.id)"
+                  class="text-indigo-600 hover:text-indigo-900 px-2 py-1 rounded-md hover:bg-indigo-50"
+                  title="Voir les détails"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+                <button
+                  (click)="startEdit(customer)"
+                  class="text-yellow-600 hover:text-yellow-900 px-2 py-1 rounded-md hover:bg-yellow-50"
+                  title="Modifier"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                </button>
+                <button
+                  (click)="confirmDelete(customer)"
+                  class="text-red-600 hover:text-red-900 px-2 py-1 rounded-md hover:bg-red-50"
+                  title="Supprimer"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
 </div>
 

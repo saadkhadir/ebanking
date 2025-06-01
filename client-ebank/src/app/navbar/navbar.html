@@ -1,0 +1,54 @@
+<nav class="bg-gradient-to-r from-blue-700 to-blue-900 shadow-lg">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <div class="flex">
+        <div class="flex-shrink-0 flex items-center">
+          <span class="text-white font-bold text-xl">E-Banking</span>
+        </div>
+        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+          <!-- Liens de navigation actifs si la route correspond -->
+          <a routerLink="/dashboard" routerLinkActive="text-white border-white" [routerLinkActiveOptions]="{exact: true}"
+             class="border-transparent text-gray-200 hover:border-white hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+            Tableau de bord
+          </a>
+          <a routerLink="/accounts" routerLinkActive="text-white border-white"
+             class="border-transparent text-gray-200 hover:border-white hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+            Comptes
+          </a>
+          <a routerLink="/customers" routerLinkActive="text-white border-white"
+             class="border-transparent text-gray-200 hover:border-white hover:text-white inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+            Clients
+          </a>
+        </div>
+      </div>
+      <div class="flex items-center">
+        <button (click)="logout()"
+                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-md flex items-center text-sm">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          Déconnexion
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu mobile -->
+  <div class="sm:hidden" id="mobile-menu">
+    <div class="pt-2 pb-3 space-y-1">
+      <a routerLink="/dashboard" routerLinkActive="bg-blue-800 text-white"
+         class="text-gray-200 hover:bg-blue-800 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+        Tableau de bord
+      </a>
+      <a routerLink="/accounts" routerLinkActive="bg-blue-800 text-white"
+         class="text-gray-200 hover:bg-blue-800 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+        Comptes
+      </a>
+      <a routerLink="/customers" routerLinkActive="bg-blue-800 text-white"
+         class="text-gray-200 hover:bg-blue-800 hover:text-white block px-3 py-2 rounded-md text-base font-medium">
+        Clients
+      </a>
+    </div>
+  </div>
+</nav>
+

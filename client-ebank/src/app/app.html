@@ -1,2 +1,10 @@
-<router-outlet></router-outlet>
+<div class="min-h-screen bg-gray-50 flex flex-col">
+  <!-- Affichage conditionnel de la navbar (masquée sur la page de connexion) -->
+  <app-navbar *ngIf="!isLoginRoute"></app-navbar>
+
+  <!-- Contenu principal avec RouterOutlet -->
+  <div class="flex-grow">
+    <router-outlet></router-outlet>
+  </div>
+</div>
 

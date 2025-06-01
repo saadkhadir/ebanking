@@ -1,0 +1,85 @@
+/* Styles pour le tableau de bord */
+.dashboard-container {
+  @apply min-h-screen bg-gray-50 p-6;
+}
+
+.dashboard-header {
+  @apply mb-6;
+}
+
+.dashboard-title {
+  @apply text-2xl font-bold text-gray-800;
+}
+
+.dashboard-subtitle {
+  @apply mt-1 text-gray-600;
+}
+
+.stats-card {
+  @apply transition-all duration-300 ease-in-out hover:shadow-lg hover:-translate-y-1;
+}
+
+.stats-icon {
+  @apply text-white bg-opacity-80 rounded-full p-3 w-12 h-12 flex items-center justify-center;
+}
+
+.chart-container {
+  @apply bg-white rounded-lg shadow p-4 h-80;
+}
+
+.chart-header {
+  @apply flex justify-between items-center mb-4;
+}
+
+.chart-title {
+  @apply text-lg font-semibold text-gray-800;
+}
+
+.table-container {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.table-header {
+  @apply sticky top-0 z-10 bg-white shadow-sm;
+}
+
+.loading-overlay {
+  @apply absolute inset-0 bg-gray-200 bg-opacity-75 flex items-center justify-center;
+}
+
+.operation-credit {
+  @apply text-green-600;
+}
+
+.operation-debit {
+  @apply text-red-600;
+}
+
+/* Animation de pulse pour les cartes */
+@keyframes pulse-slight {
+  0% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 6px rgba(59, 130, 246, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(59, 130, 246, 0);
+  }
+}
+
+.pulse-animation {
+  animation: pulse-slight 2s infinite;
+}
+
+/* Animation pour les notifications et alertes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+

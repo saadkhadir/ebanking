@@ -1,0 +1,447 @@
+<div class="bg-gray-50 min-h-screen p-6">
+  <div class="max-w-7xl mx-auto">
+    <!-- En-tête -->
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-800">Gestion des Comptes Bancaires</h1>
+      <p class="text-gray-600 mt-1">Consultez vos comptes et effectuez des opérations bancaires</p>
+    </div>
+
+    <!-- Messages de notifications -->
+    <div *ngIf="successMessage" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-4 rounded-md shadow-sm notification">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          {{ successMessage }}
+        </div>
+        <button (click)="closeSuccess()" class="text-green-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div *ngIf="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md shadow-sm notification">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+          </svg>
+          {{ error }}
+        </div>
+        <button (click)="closeError()" class="text-red-700">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Indicateur de chargement principal -->
+    <div *ngIf="loading" class="flex justify-center my-12">
+      <div class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-md">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Chargement...
+      </div>
+    </div>
+
+    <!-- Message quand aucun compte n'est trouvé -->
+    <div *ngIf="!loading && accounts.length === 0" class="bg-white p-8 rounded-lg shadow-md text-center">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+      </svg>
+      <h3 class="text-lg font-medium text-gray-700 mt-4">Aucun compte bancaire trouvé</h3>
+      <p class="text-gray-500 mt-2">Vous n'avez pas encore de comptes bancaires actifs.</p>
+    </div>
+
+    <!-- Layout principal à deux colonnes quand il y a des comptes -->
+    <div *ngIf="!loading && accounts.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <!-- Colonne de gauche: Liste des comptes -->
+      <div class="md:col-span-1">
+        <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 account-card">
+          <div class="bg-blue-600 text-white py-3 px-4">
+            <h2 class="font-semibold">Vos Comptes</h2>
+          </div>
+          <ul class="divide-y divide-gray-200">
+            <li *ngFor="let account of accounts"
+                class="cursor-pointer hover:bg-blue-50 transition-colors duration-150"
+                [class.bg-blue-50]="selectedAccount?.id === account.id"
+                (click)="selectAccount(account)">
+              <div class="px-4 py-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <div [class.bg-blue-100]="account.type === 'CurrentAccount'"
+                         [class.bg-green-100]="account.type === 'SavingAccount'"
+                         [class.text-blue-600]="account.type === 'CurrentAccount'"
+                         [class.text-green-600]="account.type === 'SavingAccount'"
+                         class="p-2 rounded-full mr-3">
+                      <svg *ngIf="account.type === 'CurrentAccount'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                      <svg *ngIf="account.type === 'SavingAccount'" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="font-medium text-gray-800">{{ getAccountTypeLabel(account.type) }}</p>
+                      <p class="text-sm text-gray-500">{{ account.id }}</p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-bold text-gray-900">{{ formatCurrency(account.balance) }}</p>
+                    <p class="text-xs text-gray-500">Client #{{ account.customerDTO.id }}</p>
+                  </div>
+                </div>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Colonne de droite: Détails du compte et opérations -->
+      <div class="md:col-span-2">
+        <!-- Message de sélection si aucun compte n'est sélectionné -->
+        <div *ngIf="!selectedAccount" class="bg-white p-8 rounded-lg shadow-md text-center border border-gray-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+          </svg>
+          <h3 class="text-lg font-medium text-gray-700 mt-4">Sélectionnez un compte</h3>
+          <p class="text-gray-500 mt-2">Veuillez sélectionner un compte pour voir les détails et effectuer des opérations.</p>
+        </div>
+
+        <!-- Détails du compte sélectionné -->
+        <div *ngIf="selectedAccount" class="space-y-6">
+          <!-- Carte d'informations du compte -->
+          <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 account-card">
+            <div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4">
+              <div class="flex justify-between items-center">
+                <div>
+                  <h2 class="text-xl font-bold">{{ getAccountTypeLabel(selectedAccount.type) }}</h2>
+                  <p class="text-sm opacity-90">{{ selectedAccount.id }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="text-lg font-bold">{{ formatCurrency(selectedAccount.balance) }}</p>
+                  <p class="text-xs opacity-75">Solde actuel</p>
+                </div>
+              </div>
+            </div>
+            <div class="p-4 bg-white">
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <p class="text-sm text-gray-500">Client</p>
+                  <p class="font-medium">{{ selectedAccount.customerDTO.name }}</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">Date de création</p>
+                  <p class="font-medium">{{ formatDate(selectedAccount.createdAt.toString()) }}</p>
+                </div>
+                <div>
+                  <p class="text-sm text-gray-500">État</p>
+                  <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    {{ selectedAccount.status }}
+                  </span>
+                </div>
+                <div *ngIf="selectedAccount.type === 'CurrentAccount'">
+                  <p class="text-sm text-gray-500">Découvert autorisé</p>
+                  <p class="font-medium">{{ formatCurrency(getOverDraft()) }}</p>
+                </div>
+                <div *ngIf="selectedAccount.type === 'SavingAccount'">
+                  <p class="text-sm text-gray-500">Taux d'intérêt</p>
+                  <p class="font-medium">{{ getInterestRate() }}%</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Boutons d'action -->
+          <div class="flex flex-wrap gap-4">
+            <button
+              (click)="toggleTransferForm()"
+              [class.bg-blue-600]="!showTransferForm"
+              [class.bg-blue-700]="showTransferForm"
+              class="flex items-center space-x-2 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+              </svg>
+              <span>Virement</span>
+            </button>
+
+            <button
+              (click)="toggleDebitForm()"
+              [class.bg-red-600]="!showDebitForm"
+              [class.bg-red-700]="showDebitForm"
+              class="flex items-center space-x-2 text-white px-4 py-2 rounded-md hover:bg-red-700 transition"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0h-3m-2-4v-4m-8 4v-4m8 12h-8" />
+              </svg>
+              <span>Débit</span>
+            </button>
+
+            <button
+              (click)="toggleCreditForm()"
+              [class.bg-green-600]="!showCreditForm"
+              [class.bg-green-700]="showCreditForm"
+              class="flex items-center space-x-2 text-white px-4 py-2 rounded-md hover:bg-green-700 transition"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1.5m6 4.5c0 2.21-3.582 4.5-6 4.5s-6-2.29-6-4.5 3.582-4.5 6-4.5 6 2.29 6 4.5zm0 7.5h-12" />
+              </svg>
+              <span>Crédit</span>
+            </button>
+          </div>
+
+          <!-- Formulaires d'opérations -->
+          <div *ngIf="showTransferForm" class="bg-white p-6 rounded-lg shadow-md border-t-4 border-blue-600 account-card">
+            <h3 class="text-lg font-semibold mb-4">Effectuer un virement</h3>
+            <form [formGroup]="transferForm" (ngSubmit)="executeTransfer()" class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Compte destinataire</label>
+                <select
+                  formControlName="accountDestination"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                >
+                  <option value="" disabled selected>Sélectionnez un compte destinataire</option>
+                  <option *ngFor="let account of accounts" [value]="account.id" [disabled]="account.id === selectedAccount?.id">
+                    {{ getAccountTypeLabel(account.type) }} - {{ account.id }}
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Montant</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">€</span>
+                  <input
+                    type="number"
+                    formControlName="amount"
+                    step="0.01"
+                    min="0.01"
+                    class="w-full pl-8 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    placeholder="0.00"
+                  >
+                </div>
+                <div *ngIf="transferForm.get('amount')?.invalid && transferForm.get('amount')?.touched" class="text-red-600 text-xs mt-1">
+                  Veuillez saisir un montant valide
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <input
+                  type="text"
+                  formControlName="description"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Motif du virement"
+                >
+                <div *ngIf="transferForm.get('description')?.invalid && transferForm.get('description')?.touched" class="text-red-600 text-xs mt-1">
+                  Veuillez saisir une description
+                </div>
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  [disabled]="transferForm.invalid"
+                  class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  Effectuer le virement
+                </button>
+                <button
+                  type="button"
+                  (click)="toggleTransferForm()"
+                  class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div *ngIf="showDebitForm" class="bg-white p-6 rounded-lg shadow-md border-t-4 border-red-600 account-card">
+            <h3 class="text-lg font-semibold mb-4">Effectuer un débit</h3>
+            <form [formGroup]="debitForm" (ngSubmit)="executeDebit()" class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Montant</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">€</span>
+                  <input
+                    type="number"
+                    formControlName="amount"
+                    step="0.01"
+                    min="0.01"
+                    class="w-full pl-8 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    placeholder="0.00"
+                  >
+                </div>
+                <div *ngIf="debitForm.get('amount')?.invalid && debitForm.get('amount')?.touched" class="text-red-600 text-xs mt-1">
+                  Veuillez saisir un montant valide
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <input
+                  type="text"
+                  formControlName="description"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                  placeholder="Motif du débit"
+                >
+                <div *ngIf="debitForm.get('description')?.invalid && debitForm.get('description')?.touched" class="text-red-600 text-xs mt-1">
+                  Veuillez saisir une description
+                </div>
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  [disabled]="debitForm.invalid"
+                  class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  Effectuer le débit
+                </button>
+                <button
+                  type="button"
+                  (click)="toggleDebitForm()"
+                  class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <div *ngIf="showCreditForm" class="bg-white p-6 rounded-lg shadow-md border-t-4 border-green-600 account-card">
+            <h3 class="text-lg font-semibold mb-4">Effectuer un crédit</h3>
+            <form [formGroup]="creditForm" (ngSubmit)="executeCredit()" class="space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Montant</label>
+                <div class="relative">
+                  <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-500">€</span>
+                  <input
+                    type="number"
+                    formControlName="amount"
+                    step="0.01"
+                    min="0.01"
+                    class="w-full pl-8 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                    placeholder="0.00"
+                  >
+                </div>
+                <div *ngIf="creditForm.get('amount')?.invalid && creditForm.get('amount')?.touched" class="text-red-600 text-xs mt-1">
+                  Veuillez saisir un montant valide
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <input
+                  type="text"
+                  formControlName="description"
+                  class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="Motif du crédit"
+                >
+                <div *ngIf="creditForm.get('description')?.invalid && creditForm.get('description')?.touched" class="text-red-600 text-xs mt-1">
+                  Veuillez saisir une description
+                </div>
+              </div>
+
+              <div class="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  [disabled]="creditForm.invalid"
+                  class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md disabled:opacity-50 disabled:cursor-not-allowed transition"
+                >
+                  Effectuer le crédit
+                </button>
+                <button
+                  type="button"
+                  (click)="toggleCreditForm()"
+                  class="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md transition"
+                >
+                  Annuler
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Historique des opérations -->
+          <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 account-card">
+            <div class="bg-gray-800 text-white py-3 px-4 flex justify-between items-center">
+              <h2 class="font-semibold">Historique des opérations</h2>
+
+              <!-- Pagination -->
+              <div *ngIf="accountHistory" class="flex items-center space-x-2 text-sm">
+                <button
+                  [disabled]="currentPage === 0"
+                  (click)="previousPage()"
+                  class="p-1 rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+                <span>Page {{ currentPage + 1 }} sur {{ accountHistory.totalPages || 1 }}</span>
+                <button
+                  [disabled]="!accountHistory.totalPages || currentPage >= accountHistory.totalPages - 1"
+                  (click)="nextPage()"
+                  class="p-1 rounded-md hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Indicateur de chargement pour les opérations -->
+            <div *ngIf="operationsLoading" class="flex justify-center py-8">
+              <div class="inline-flex items-center">
+                <svg class="animate-spin h-6 w-6 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span class="ml-2 text-gray-700">Chargement des opérations...</span>
+              </div>
+            </div>
+
+            <!-- Pas d'opérations trouvées -->
+            <div *ngIf="!operationsLoading && accountHistory && accountHistory.accountOperationDTOS.length === 0" class="py-8 text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              <p class="text-gray-500 mt-2">Aucune opération trouvée pour ce compte.</p>
+            </div>
+
+            <!-- Liste des opérations -->
+            <div *ngIf="!operationsLoading && accountHistory && accountHistory.accountOperationDTOS.length > 0" class="divide-y divide-gray-200">
+              <div *ngFor="let operation of accountHistory.accountOperationDTOS" class="px-4 py-3 hover:bg-gray-50 operation-item">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center">
+                    <div [class]="operation.type === 'CREDIT' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'" class="p-2 rounded-full mr-3">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="getOperationIcon(operation.type)" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p class="font-medium text-gray-800">{{ operation.description }}</p>
+                      <p class="text-xs text-gray-500">{{ formatDate(operation.operationDate.toString()) }}</p>
+                    </div>
+                  </div>
+                  <div [class]="getOperationTypeClass(operation.type)" class="font-bold">
+                    {{ operation.type === 'CREDIT' ? '+' : '-' }}{{ formatCurrency(operation.amount) }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

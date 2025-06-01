@@ -1,0 +1,146 @@
+<div class="dashboard-container">
+  <div class="max-w-7xl mx-auto">
+    <!-- En-tête du tableau de bord -->
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">Tableau de Bord Bancaire</h1>
+      <p class="dashboard-subtitle">Analyse et statistiques bancaires</p>
+    </div>
+
+    <!-- Message d'erreur -->
+    <div *ngIf="error" class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-4 rounded-md shadow-sm fade-in">
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+        </svg>
+        {{ error }}
+      </div>
+      <button (click)="error = null" class="text-sm underline mt-1">Fermer</button>
+    </div>
+
+    <!-- Indicateur de chargement principal -->
+    <div *ngIf="loading" class="flex justify-center my-12">
+      <div class="inline-flex items-center px-4 py-2 bg-blue-100 text-blue-700 rounded-md">
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-700" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Chargement des données...
+      </div>
+    </div>
+
+    <div *ngIf="!loading" class="space-y-6">
+      <!-- Cartes de statistiques -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div *ngFor="let card of cards" class="bg-white rounded-lg shadow-md overflow-hidden stats-card">
+          <div class="p-5">
+            <div class="flex items-center">
+              <div [class]="card.color + ' stats-icon'">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" *ngIf="card.icon === 'users'">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" *ngIf="card.icon === 'credit-card'">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" *ngIf="card.icon === 'money-bill'">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" *ngIf="card.icon === 'chart-line'">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                </svg>
+              </div>
+              <div class="ml-5">
+                <p class="text-gray-500 text-sm">{{ card.title }}</p>
+                <p class="font-semibold text-xl">
+                  {{ card.isCurrency ? formatCurrency(card.value) : card.value }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Graphiques principaux -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Graphique en bâtons: Crédits vs Débits -->
+        <div class="chart-container relative">
+          <div class="chart-header">
+            <h3 class="chart-title">Activité Mensuelle</h3>
+          </div>
+          <canvas
+            baseChart
+            [data]="operationsData"
+            [options]="barChartOptions"
+            [type]="barChartType"
+          >
+          </canvas>
+        </div>
+
+        <!-- Graphique d'évolution du solde -->
+        <div class="chart-container relative">
+          <div class="chart-header">
+            <h3 class="chart-title">Évolution du Solde</h3>
+          </div>
+          <canvas
+            baseChart
+            [data]="balanceHistoryData"
+            [options]="lineChartOptions"
+            [type]="lineChartType"
+          >
+          </canvas>
+        </div>
+      </div>
+
+      <!-- Deuxième ligne de graphiques et tableaux -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Graphique en camembert: Types de comptes -->
+        <div class="chart-container relative">
+          <div class="chart-header">
+            <h3 class="chart-title">Types de Comptes</h3>
+          </div>
+          <canvas
+            baseChart
+            [data]="accountTypeData"
+            [options]="pieChartOptions"
+            [type]="pieChartType"
+          >
+          </canvas>
+        </div>
+
+        <!-- Tableau des opérations récentes -->
+        <div class="lg:col-span-2 bg-white p-4 rounded-lg shadow relative">
+          <h3 class="text-lg font-semibold mb-4">Opérations Récentes</h3>
+
+          <div class="table-container">
+            <table class="min-w-full">
+              <thead class="table-header">
+                <tr class="border-b">
+                  <th class="py-2 px-4 text-left text-sm font-semibold text-gray-600">Date</th>
+                  <th class="py-2 px-4 text-left text-sm font-semibold text-gray-600">Description</th>
+                  <th class="py-2 px-4 text-right text-sm font-semibold text-gray-600">Type</th>
+                  <th class="py-2 px-4 text-right text-sm font-semibold text-gray-600">Montant</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngIf="recentOperations.length === 0" class="border-b">
+                  <td colspan="4" class="py-4 px-4 text-center text-gray-500">
+                    Aucune opération récente à afficher
+                  </td>
+                </tr>
+                <tr *ngFor="let operation of recentOperations" class="hover:bg-gray-50 border-b">
+                  <td class="py-3 px-4 text-sm text-gray-600">{{ formatDate(operation.operationDate.toString()) }}</td>
+                  <td class="py-3 px-4 text-sm">{{ operation.description }}</td>
+                  <td [class]="'py-3 px-4 text-sm font-medium text-right ' + getOperationTypeClass(operation.type)">
+                    {{ operation.type }}
+                  </td>
+                  <td [class]="'py-3 px-4 text-sm font-medium text-right ' + getOperationTypeClass(operation.type)">
+                    {{ operation.type === 'CREDIT' ? '+' : '-' }}{{ formatCurrency(operation.amount) }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
